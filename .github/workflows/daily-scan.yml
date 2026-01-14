@@ -1,0 +1,23 @@
+# Daily U-Turn Scanner
+name: Daily U-Turn Scan
+
+on:
+  schedule:
+      - cron: '0 9 * * *'
+        workflow_dispatch:
+
+        permissions:
+          contents: write
+
+          jobs:
+            scan-for-uturns:
+                runs-on: ubuntu-latest
+                    steps:
+                          - uses: actions/checkout@v4
+                                - uses: actions/setup-node@v4
+                                        with:
+                                                  node-version: '20'
+                                                        - name: Scan news
+                                                                env:
+                                                                          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+                                                                                  run: echo "Ready for scanning"
