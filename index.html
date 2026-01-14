@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔄 UK Government U-Turn Tracker | uturn.to</title>
+    <meta name="description" content="Tracking every policy reversal, flip-flop, and 180° spin from the UK Government. Updated daily.">
+    <meta property="og:title" content="UK Government U-Turn Tracker">
+    <meta property="og:description" content="The definitive counter of governmental about-faces">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://uturn.to">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:wght@400;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔄</text></svg>">
+</head>
+<body>
+    <div class="noise-overlay"></div>
+    
+    <header class="hero">
+        <div class="hero-content">
+            <div class="spinning-uturn" aria-hidden="true">↩</div>
+            <h1 class="main-title">
+                <span class="title-line">UK Government</span>
+                <span class="title-big">U-TURN</span>
+                <span class="title-line">TRACKER</span>
+            </h1>
+            <p class="tagline">"We're not changing direction, we're <em>recalibrating</em>"</p>
+        </div>
+        
+        <div class="counter-section">
+            <div class="mega-counter">
+                <span class="counter-label">Total U-Turns Since July 2024</span>
+                <div class="counter-number" id="totalCount">13</div>
+                <span class="counter-sublabel">and counting...</span>
+            </div>
+            
+            <div class="stats-row">
+                <div class="stat-box">
+                    <span class="stat-number" id="daysInPower">559</span>
+                    <span class="stat-label">Days in Power</span>
+                </div>
+                <div class="stat-box featured">
+                    <span class="stat-number" id="uturnsPerMonth">0.7</span>
+                    <span class="stat-label">U-Turns per Month</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-number" id="fastestUturn">97</span>
+                    <span class="stat-label">Fastest U-Turn (days)</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="scroll-indicator">
+            <span>Scroll for the full horror show</span>
+            <div class="scroll-arrow">↓</div>
+        </div>
+    </header>
+
+    <section class="leaderboard-section">
+        <h2 class="section-title">🏆 Minister Leaderboard</h2>
+        <p class="section-subtitle">Who's really steering this ship?</p>
+        
+        <div class="leaderboard" id="ministerLeaderboard">
+        </div>
+    </section>
+
+    <section class="filter-section">
+        <div class="filter-bar">
+            <button class="filter-btn active" data-filter="all">All U-Turns</button>
+            <button class="filter-btn" data-filter="welfare">💷 Welfare</button>
+            <button class="filter-btn" data-filter="taxation">💰 Tax</button>
+            <button class="filter-btn" data-filter="major">🔥 Major Only</button>
+        </div>
+        
+        <div class="sort-controls">
+            <label>Sort by:</label>
+            <select id="sortSelect">
+                <option value="recent">Most Recent</option>
+                <option value="fastest">Fastest U-Turn</option>
+                <option value="slowest">Slowest U-Turn</option>
+            </select>
+        </div>
+    </section>
+
+    <main class="uturns-grid" id="uturnsGrid">
+    </main>
+
+    <section class="speed-run-section">
+        <h2 class="section-title">⚡ Speed Run Hall of Fame</h2>
+        <p class="section-subtitle">Fastest policy reversals in government history</p>
+        
+        <div class="speed-runs" id="speedRuns">
+        </div>
+    </section>
+
+    <section class="timeline-section">
+        <h2 class="section-title">📅 The Timeline of Chaos</h2>
+        <div class="timeline" id="timeline">
+        </div>
+    </section>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <span class="spinning-uturn-small">↩</span>
+                <span>uturn.to</span>
+            </div>
+            <p class="footer-tagline">Tracking governmental about-faces so you don't have to</p>
+            <p class="footer-update">Last updated: <span id="lastUpdate">Loading...</span></p>
+            <p class="footer-disclaimer">Data sourced from news reports. Updates daily via AI news scanning.</p>
+            <div class="footer-links">
+                <a href="https://github.com/matthewdavidrussell/uk-uturn-tracker" target="_blank">GitHub</a>
+                <span>•</span>
+                <a href="#" id="scanNews">🔍 Scan for New U-Turns</a>
+            </div>
+        </div>
+        <div class="footer-decoration">
+            <span>↩</span><span>↪</span><span>↩</span><span>↪</span><span>↩</span><span>↪</span><span>↩</span><span>↪</span>
+        </div>
+    </footer>
+
+    <div class="modal" id="scanModal">
+        <div class="modal-content">
+            <h3>🔍 Scanning UK News...</h3>
+            <div class="scan-progress">
+                <div class="scan-bar"></div>
+            </div>
+            <p class="scan-status" id="scanStatus">Searching for policy reversals...</p>
+            <div class="scan-results" id="scanResults"></div>
+            <button class="modal-close" id="modalClose">Close</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
