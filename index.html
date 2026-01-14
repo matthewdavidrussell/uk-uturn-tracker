@@ -1,23 +1,90 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🔄 UK Government U-Turn Tracker | uturn.to</title>
-    <meta name="description" content="Tracking every policy reversal, flip-flop, and 180° spin from the UK Government. Updated daily.">
-    <meta property="og:title" content="UK Government U-Turn Tracker">
-    <meta property="og:description" content="The definitive counter of governmental about-faces">
+    
+    <!-- SEO Meta Tags -->
+    <title>UK Government U-Turn Tracker | Every Policy Reversal Since 2024 | uturn.to</title>
+    <meta name="description" content="Track every UK government policy U-turn, reversal and climbdown since July 2024. Currently at 13 U-turns. Updated daily with AI-powered news scanning.">
+    <meta name="keywords" content="UK government, U-turn, policy reversal, Labour, Keir Starmer, Rachel Reeves, British politics, policy tracker">
+    <meta name="author" content="uturn.to">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://uturn.to">
+    
+    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://uturn.to">
+    <meta property="og:title" content="UK Government U-Turn Tracker | 13 Policy Reversals and Counting">
+    <meta property="og:description" content="The definitive tracker of UK government policy U-turns. From Winter Fuel to Digital IDs - every climbdown documented.">
+    <meta property="og:image" content="https://uturn.to/og-image.png">
+    <meta property="og:locale" content="en_GB">
+    <meta property="og:site_name" content="UK U-Turn Tracker">
     
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://uturn.to">
+    <meta name="twitter:title" content="UK Government U-Turn Tracker">
+    <meta name="twitter:description" content="13 policy reversals since July 2024. Track every government climbdown.">
+    <meta name="twitter:image" content="https://uturn.to/og-image.png">
+    
+    <!-- Geo Tags -->
+    <meta name="geo.region" content="GB">
+    <meta name="geo.placename" content="United Kingdom">
+    <meta name="DC.language" content="en-GB">
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "UK Government U-Turn Tracker",
+        "url": "https://uturn.to",
+        "description": "Tracking every UK government policy reversal since July 2024",
+        "publisher": {
+            "@type": "Organization",
+            "name": "uturn.to"
+        }
+    }
+    </script>
+    
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Dataset",
+        "name": "UK Government Policy U-Turns 2024-2026",
+        "description": "A comprehensive dataset of UK government policy reversals under the Labour administration",
+        "url": "https://uturn.to",
+        "license": "https://opensource.org/licenses/MIT",
+        "temporalCoverage": "2024-07-05/..",
+        "spatialCoverage": {
+            "@type": "Place",
+            "name": "United Kingdom"
+        }
+    }
+    </script>
+    
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:wght@400;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
     <link rel="stylesheet" href="style.css">
+    
+    <!-- Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔄</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔄</text></svg>">
 </head>
 <body>
     <div class="noise-overlay"></div>
+    
+    <!-- Live Scan Banner -->
+    <div class="live-banner" id="liveBanner">
+        <span class="live-dot"></span>
+        <span>Last checked: <span id="lastChecked">Loading...</span></span>
+        <button class="scan-now-btn" id="scanNowBtn">🔍 Check for New U-Turns</button>
+    </div>
     
     <header class="hero">
         <div class="hero-content">
@@ -58,6 +125,93 @@
             <div class="scroll-arrow">↓</div>
         </div>
     </header>
+
+    <!-- Press Coverage Section -->
+    <section class="press-section">
+        <h2 class="section-title">📰 In The Press</h2>
+        <p class="section-subtitle">What the papers are saying about this government's direction changes</p>
+        
+        <div class="press-grid" id="pressGrid">
+            <a href="https://www.lbc.co.uk/article/inside-all-labour-u-turns-farmers-digital-id-keir-starmer-5HjdQhm_2/" target="_blank" rel="noopener" class="press-card">
+                <span class="press-source">LBC</span>
+                <span class="press-headline">Inside all 13 Labour U-turns since taking power</span>
+                <span class="press-date">Jan 2026</span>
+            </a>
+            <a href="https://www.bloomberg.com/news/articles/2026-01-14/starmer-faces-own-taco-problem-after-latest-policy-reversal" target="_blank" rel="noopener" class="press-card">
+                <span class="press-source">Bloomberg</span>
+                <span class="press-headline">Starmer Faces Pressure Over Policy Reversals</span>
+                <span class="press-date">Jan 2026</span>
+            </a>
+            <a href="https://www.itv.com/news/2026-01-13/government-u-turns-on-mandatory-digital-id-cards" target="_blank" rel="noopener" class="press-card">
+                <span class="press-source">ITV News</span>
+                <span class="press-headline">Government U-turns on mandatory digital ID cards</span>
+                <span class="press-date">Jan 2026</span>
+            </a>
+            <a href="https://www.gbnews.com/politics/politics-news-labour-angela-rayner-wipeout-reform-nigel-farage-conservatives" target="_blank" rel="noopener" class="press-card">
+                <span class="press-source">GB News</span>
+                <span class="press-headline">Keir Starmer set for 13th major U-turn</span>
+                <span class="press-date">Jan 2026</span>
+            </a>
+            <a href="https://www.newstatesman.com/politics/2025/11/how-labour-changed-its-mind-on-the-two-child-benefit-cap" target="_blank" rel="noopener" class="press-card">
+                <span class="press-source">New Statesman</span>
+                <span class="press-headline">How Labour changed its mind on the two-child cap</span>
+                <span class="press-date">Nov 2025</span>
+            </a>
+            <a href="https://www.bigissue.com/news/social-justice/winter-fuel-payment-labour-u-turn-pensioners/" target="_blank" rel="noopener" class="press-card">
+                <span class="press-source">Big Issue</span>
+                <span class="press-headline">Labour U-turn sees majority of pensioners given winter fuel</span>
+                <span class="press-date">Jun 2025</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Twitter/X Feed Section -->
+    <section class="social-section">
+        <h2 class="section-title">🐦 Political Pulse</h2>
+        <p class="section-subtitle">What journalists and commentators are saying</p>
+        
+        <div class="social-grid">
+            <div class="twitter-embed">
+                <a class="twitter-timeline" 
+                   data-height="500" 
+                   data-theme="light"
+                   data-chrome="noheader nofooter noborders"
+                   href="https://twitter.com/search?q=%22government%20u-turn%22%20OR%20%22policy%20reversal%22%20lang%3Aen&f=live">
+                   Loading tweets about UK government U-turns...
+                </a>
+            </div>
+            <div class="journalist-feeds">
+                <h3>📌 Follow the Story</h3>
+                <div class="journalist-list">
+                    <a href="https://twitter.com/PippaCrerar" target="_blank" rel="noopener" class="journalist-link">
+                        <span class="journalist-name">Pippa Crerar</span>
+                        <span class="journalist-outlet">The Guardian</span>
+                    </a>
+                    <a href="https://twitter.com/BethRigby" target="_blank" rel="noopener" class="journalist-link">
+                        <span class="journalist-name">Beth Rigby</span>
+                        <span class="journalist-outlet">Sky News</span>
+                    </a>
+                    <a href="https://twitter.com/Paborton" target="_blank" rel="noopener" class="journalist-link">
+                        <span class="journalist-name">Faisal Islam</span>
+                        <span class="journalist-outlet">BBC Economics</span>
+                    </a>
+                    <a href="https://twitter.com/Steven_Swinford" target="_blank" rel="noopener" class="journalist-link">
+                        <span class="journalist-name">Steven Swinford</span>
+                        <span class="journalist-outlet">The Times</span>
+                    </a>
+                    <a href="https://twitter.com/tnewtondunn" target="_blank" rel="noopener" class="journalist-link">
+                        <span class="journalist-name">Tom Newton Dunn</span>
+                        <span class="journalist-outlet">Times Radio</span>
+                    </a>
+                    <a href="https://twitter.com/Peston" target="_blank" rel="noopener" class="journalist-link">
+                        <span class="journalist-name">Robert Peston</span>
+                        <span class="journalist-outlet">ITV News</span>
+                    </a>
+                </div>
+                <p class="journalist-note">These journalists regularly cover UK policy changes</p>
+            </div>
+        </div>
+    </section>
 
     <section class="leaderboard-section">
         <h2 class="section-title">🏆 Minister Leaderboard</h2>
@@ -118,7 +272,9 @@
             <div class="footer-links">
                 <a href="https://github.com/matthewdavidrussell/uk-uturn-tracker" target="_blank">GitHub</a>
                 <span>•</span>
-                <a href="#" id="scanNews">🔍 Scan for New U-Turns</a>
+                <a href="#" id="footerScanNews">🔍 Scan for New U-Turns</a>
+                <span>•</span>
+                <a href="https://twitter.com/intent/tweet?text=The%20UK%20government%20has%20made%2013%20U-turns%20since%20July%202024.%20Track%20them%20all%20at&url=https://uturn.to" target="_blank">Share on X</a>
             </div>
         </div>
         <div class="footer-decoration">
@@ -126,18 +282,43 @@
         </div>
     </footer>
 
+    <!-- Scan Modal -->
     <div class="modal" id="scanModal">
         <div class="modal-content">
             <h3>🔍 Scanning UK News...</h3>
             <div class="scan-progress">
-                <div class="scan-bar"></div>
+                <div class="scan-bar" id="scanBar"></div>
             </div>
-            <p class="scan-status" id="scanStatus">Searching for policy reversals...</p>
+            <p class="scan-status" id="scanStatus">Initializing...</p>
             <div class="scan-results" id="scanResults"></div>
             <button class="modal-close" id="modalClose">Close</button>
         </div>
     </div>
 
+    <!-- API Key Modal (for first-time setup) -->
+    <div class="modal" id="apiKeyModal">
+        <div class="modal-content">
+            <h3>🔑 Set Up Live Scanning</h3>
+            <p style="margin-bottom: 1rem; font-family: var(--font-body);">
+                To enable live U-turn scanning, enter your Anthropic API key. 
+                This is stored only in your browser's local storage.
+            </p>
+            <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-..." 
+                   style="width: 100%; padding: 0.75rem; margin-bottom: 1rem; font-family: var(--font-mono); border: 2px solid var(--ink);">
+            <div style="display: flex; gap: 1rem;">
+                <button class="modal-close" id="saveApiKey" style="background: var(--red-primary);">Save Key</button>
+                <button class="modal-close" id="cancelApiKey">Cancel</button>
+            </div>
+            <p style="margin-top: 1rem; font-size: 0.8rem; color: var(--ink-light); font-family: var(--font-mono);">
+                Get a key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Twitter Widget -->
+    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+    
+    <!-- Main App -->
     <script src="app.js"></script>
 </body>
 </html>

@@ -1,0 +1,5 @@
+# UK U-Turn Tracker - robots.txt
+User-agent: *
+Allow: /
+
+Sitemap: https://uturn.to/sitemap.xml
