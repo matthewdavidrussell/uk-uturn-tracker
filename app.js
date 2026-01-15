@@ -1,12 +1,10 @@
 // ==========================================================================
 // UK U-TURN TRACKER v2 - Main Application
-// Now with Live AI-Powered Scanning
+// Seamless auto-updating - no user setup required
 // ==========================================================================
 
 let uturnsData = null;
 const GOVERNMENT_START = new Date('2024-07-05');
-const API_KEY_STORAGE = 'uturn_api_key';
-const LAST_SCAN_STORAGE = 'uturn_last_scan';
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', async () => {
@@ -55,41 +53,31 @@ function setupEventListeners() {
         renderUturns(activeFilter, e.target.value);
     });
     
-    // Scan buttons (header and footer)
-    document.getElementById('scanNowBtn').addEventListener('click', startScan);
+    // Scan buttons - now just show info modal (no API key needed)
+    document.getElementById('scanNowBtn').addEventListener('click', showScanInfo);
     document.getElementById('footerScanNews').addEventListener('click', (e) => {
         e.preventDefault();
-        startScan();
+        showScanInfo();
     });
     
     // Modal close
     document.getElementById('modalClose').addEventListener('click', closeScanModal);
-    
-    // API key modal
-    document.getElementById('saveApiKey').addEventListener('click', saveApiKey);
-    document.getElementById('cancelApiKey').addEventListener('click', () => {
-        document.getElementById('apiKeyModal').classList.remove('active');
-    });
 }
 
 // Update last checked timestamp
 function updateLastChecked() {
-    const lastScan = localStorage.getItem(LAST_SCAN_STORAGE);
     const el = document.getElementById('lastChecked');
-    
-    if (lastScan) {
-        const date = new Date(lastScan);
+    if (uturnsData && uturnsData.meta.lastUpdated) {
+        const lastUpdate = new Date(uturnsData.meta.lastUpdated);
         const now = new Date();
-        const diffMins = Math.floor((now - date) / 60000);
+        const diffHours = Math.floor((now - lastUpdate) / 3600000);
         
-        if (diffMins < 1) {
-            el.textContent = 'Just now';
-        } else if (diffMins < 60) {
-            el.textContent = `${diffMins} mins ago`;
-        } else if (diffMins < 1440) {
-            el.textContent = `${Math.floor(diffMins / 60)} hours ago`;
+        if (diffHours < 1) {
+            el.textContent = 'Less than 1 hour ago';
+        } else if (diffHours < 24) {
+            el.textContent = diffHours + ' hours ago';
         } else {
-            el.textContent = date.toLocaleDateString('en-GB', { 
+            el.textContent = lastUpdate.toLocaleDateString('en-GB', { 
                 day: 'numeric', 
                 month: 'short',
                 hour: '2-digit',
@@ -97,7 +85,7 @@ function updateLastChecked() {
             });
         }
     } else {
-        el.textContent = 'Never';
+        el.textContent = 'Daily at 9am UK';
     }
 }
 
@@ -110,7 +98,6 @@ function updateStats() {
     const monthsInPower = daysInPower / 30.44;
     const uturnsPerMonth = (uturnsData.meta.totalCount / monthsInPower).toFixed(1);
     
-    // Find fastest U-turn
     const fastestUturn = Math.min(...uturnsData.uturns.map(u => u.daysToUturn));
     
     document.getElementById('totalCount').textContent = uturnsData.meta.totalCount;
@@ -118,7 +105,6 @@ function updateStats() {
     document.getElementById('uturnsPerMonth').textContent = uturnsPerMonth;
     document.getElementById('fastestUturn').textContent = fastestUturn;
     
-    // Animate counter
     animateCounter('totalCount', uturnsData.meta.totalCount);
 }
 
@@ -155,7 +141,7 @@ function renderMinisterLeaderboard() {
     
     container.innerHTML = ministers.map(([name, data], index) => `
         <div class="leader-card">
-            <div class="leader-rank">${index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : index + 1}</div>
+            <div class="leader-rank">${index === 0 ? 'ð¥' : index === 1 ? 'ð¥' : index === 2 ? 'ð¥' : index + 1}</div>
             <div class="leader-info">
                 <div class="leader-name">${name}</div>
                 <div class="leader-role">${data.role}</div>
@@ -174,14 +160,12 @@ function renderUturns(filter = 'all', sort = 'recent') {
     
     let uturns = [...uturnsData.uturns];
     
-    // Apply filter
     if (filter === 'major') {
         uturns = uturns.filter(u => u.severity === 'major');
     } else if (filter !== 'all') {
         uturns = uturns.filter(u => u.category === filter);
     }
     
-    // Apply sort
     switch (sort) {
         case 'recent':
             uturns.sort((a, b) => new Date(b.dateReversed) - new Date(a.dateReversed));
@@ -209,16 +193,12 @@ function renderUturns(filter = 'all', sort = 'recent') {
                         <span class="policy-label">Original Position</span>
                         <p class="policy-original">${uturn.originalPolicy}</p>
                         <span class="policy-label">U-Turn</span>
-                        <p class="policy-reversal">↩ ${uturn.reversal}</p>
-                        ${uturn.secondReversal ? `
-                            <span class="policy-label">Double U-Turn</span>
-                            <p class="policy-reversal">↩↩ ${uturn.secondReversal}</p>
-                        ` : ''}
+                        <p class="policy-reversal">â© ${uturn.reversal}</p>
                     </div>
                     <p class="card-summary">"${uturn.summary}"</p>
                 </div>
                 <div class="card-footer">
-                    <span class="card-minister">📌 ${uturn.minister}</span>
+                    <span class="card-minister">ðÌ ${uturn.minister}</span>
                     <span class="card-date">${formatDate(uturn.dateReversed)}</span>
                 </div>
             </article>
@@ -235,7 +215,7 @@ function renderSpeedRuns() {
         .sort((a, b) => a.daysToUturn - b.daysToUturn)
         .slice(0, 5);
     
-    const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
+    const medals = ['ð¥', 'ð¥', 'ð¥', '4ï¸â£', '5ï¸â£'];
     
     container.innerHTML = fastest.map((uturn, index) => `
         <div class="speed-card">
@@ -246,7 +226,7 @@ function renderSpeedRuns() {
             </div>
             <div class="speed-info">
                 <div class="speed-title">${uturn.title}</div>
-                <div class="speed-detail">${formatDate(uturn.dateAnnounced)} → ${formatDate(uturn.dateReversed)}</div>
+                <div class="speed-detail">${formatDate(uturn.dateAnnounced)} â ${formatDate(uturn.dateReversed)}</div>
             </div>
         </div>
     `).join('');
@@ -281,197 +261,63 @@ function formatDate(dateStr) {
 }
 
 // ==========================================================================
-// LIVE SCANNING FUNCTIONALITY
+// SCAN INFO MODAL - No API key required!
 // ==========================================================================
 
-function startScan() {
-    const apiKey = localStorage.getItem(API_KEY_STORAGE);
-    
-    if (!apiKey) {
-        // Show API key setup modal
-        document.getElementById('apiKeyModal').classList.add('active');
-        return;
-    }
-    
-    // Open scan modal and begin
-    openScanModal();
-    performLiveScan(apiKey);
-}
-
-function saveApiKey() {
-    const input = document.getElementById('apiKeyInput');
-    const key = input.value.trim();
-    
-    if (key && key.startsWith('sk-ant-')) {
-        localStorage.setItem(API_KEY_STORAGE, key);
-        document.getElementById('apiKeyModal').classList.remove('active');
-        input.value = '';
-        
-        // Now start the scan
-        openScanModal();
-        performLiveScan(key);
-    } else {
-        alert('Please enter a valid Anthropic API key (starts with sk-ant-)');
-    }
-}
-
-function openScanModal() {
-    document.getElementById('scanModal').classList.add('active');
-    document.getElementById('scanResults').innerHTML = '';
-    document.getElementById('scanBar').style.width = '0%';
-    document.getElementById('scanStatus').textContent = 'Initializing...';
-    document.getElementById('scanNowBtn').classList.add('scanning');
-}
-
-function closeScanModal() {
-    document.getElementById('scanModal').classList.remove('active');
-    document.getElementById('scanNowBtn').classList.remove('scanning');
-}
-
-async function performLiveScan(apiKey) {
+function showScanInfo() {
+    const modal = document.getElementById('scanModal');
     const statusEl = document.getElementById('scanStatus');
     const resultsEl = document.getElementById('scanResults');
     const barEl = document.getElementById('scanBar');
     
-    try {
-        // Update progress
-        barEl.style.width = '20%';
-        statusEl.textContent = 'Connecting to Claude API...';
-        await sleep(500);
-        
-        barEl.style.width = '40%';
-        statusEl.textContent = 'Searching UK news sources...';
-        
-        const response = await fetch('https://api.anthropic.com/v1/messages', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'x-api-key': apiKey,
-                'anthropic-version': '2023-06-01',
-                'anthropic-dangerous-direct-browser-access': 'true'
-            },
-            body: JSON.stringify({
-                model: 'claude-sonnet-4-20250514',
-                max_tokens: 2000,
-                tools: [{
-                    type: 'web_search_20250305',
-                    name: 'web_search'
-                }],
-                messages: [{
-                    role: 'user',
-                    content: `You are tracking UK government policy U-turns. Search for any NEW policy reversals, climbdowns, or U-turns announced by the UK Labour government in the last 48 hours.
-
-Search for: "UK government U-turn" OR "Labour reversal" OR "Starmer backs down" OR "policy climbdown"
-
-After searching, analyze if there are any GENUINE new U-turns (not ones already known like: Winter Fuel Payment, Two-Child Cap, Farm Tax, PIP cuts, Digital ID, Grooming Gangs inquiry, WASPI, NI freeze, Pub rates, Employment rights, Fiscal rules, Trans definition, Employer NI).
-
-Respond with ONLY valid JSON:
-{
-  "found": true/false,
-  "scanTime": "${new Date().toISOString()}",
-  "uturns": [
-    {
-      "title": "Short title",
-      "originalPolicy": "What they said before",
-      "reversal": "What they changed to",
-      "category": "welfare|taxation|immigration|justice|pensions|business|employment|economy|equality",
-      "minister": "Name of minister",
-      "dateReversed": "YYYY-MM-DD",
-      "summary": "One witty sentence",
-      "source": "URL"
-    }
-  ],
-  "recentNews": "Brief summary of any relevant political news even if not a U-turn"
-}`
-                }]
-            })
-        });
-        
-        barEl.style.width = '70%';
-        statusEl.textContent = 'Analyzing search results...';
-        
-        if (!response.ok) {
-            throw new Error(`API error: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        
-        barEl.style.width = '90%';
-        statusEl.textContent = 'Processing findings...';
-        
-        // Extract text from response
-        let resultText = '';
-        for (const block of data.content) {
-            if (block.type === 'text') {
-                resultText += block.text;
-            }
-        }
-        
-        // Try to parse JSON from response
-        const jsonMatch = resultText.match(/\{[\s\S]*\}/);
-        
-        barEl.style.width = '100%';
-        
-        if (jsonMatch) {
-            try {
-                const results = JSON.parse(jsonMatch[0]);
-                
-                // Update last scan time
-                localStorage.setItem(LAST_SCAN_STORAGE, new Date().toISOString());
-                updateLastChecked();
-                
-                if (results.found && results.uturns && results.uturns.length > 0) {
-                    statusEl.textContent = `🚨 Found ${results.uturns.length} potential new U-turn(s)!`;
-                    resultsEl.innerHTML = results.uturns.map(u => `
-                        <div class="found-uturn">
-                            <strong>📰 ${u.title}</strong><br>
-                            <small>${u.summary}</small><br>
-                            ${u.source ? `<a href="${u.source}" target="_blank">Read more →</a>` : ''}
-                        </div>
-                    `).join('');
-                    
-                    if (results.recentNews) {
-                        resultsEl.innerHTML += `<p style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #ccc;"><strong>📋 Other news:</strong> ${results.recentNews}</p>`;
-                    }
-                } else {
-                    statusEl.textContent = '✅ No new U-turns detected!';
-                    resultsEl.innerHTML = `
-                        <p class="no-uturn">All quiet on the policy front... for now.</p>
-                        ${results.recentNews ? `<p style="margin-top: 1rem;"><strong>📋 Recent political news:</strong> ${results.recentNews}</p>` : ''}
-                    `;
-                }
-            } catch (parseErr) {
-                statusEl.textContent = '✅ Scan complete';
-                resultsEl.innerHTML = `<p>Analysis complete. No structured results available.</p><p style="font-size: 0.8rem; color: #666; margin-top: 1rem;">${resultText.substring(0, 500)}...</p>`;
-            }
-        } else {
-            statusEl.textContent = '✅ Scan complete';
-            resultsEl.innerHTML = `<p>${resultText.substring(0, 500)}...</p>`;
-        }
-        
-    } catch (error) {
-        barEl.style.width = '100%';
-        statusEl.textContent = '❌ Scan failed';
-        
-        if (error.message.includes('401') || error.message.includes('403')) {
-            resultsEl.innerHTML = `
-                <p style="color: var(--red-primary);">API key invalid or expired.</p>
-                <button onclick="localStorage.removeItem('${API_KEY_STORAGE}'); location.reload();" 
-                        style="margin-top: 1rem; padding: 0.5rem 1rem; cursor: pointer;">
-                    Reset API Key
-                </button>
-            `;
-        } else {
-            resultsEl.innerHTML = `<p style="color: var(--red-primary);">Error: ${error.message}</p>`;
-        }
-    }
+    modal.classList.add('active');
+    barEl.style.width = '100%';
     
-    document.getElementById('scanNowBtn').classList.remove('scanning');
+    const lastUpdate = uturnsData ? new Date(uturnsData.meta.lastUpdated) : null;
+    const lastUpdateStr = lastUpdate ? lastUpdate.toLocaleDateString('en-GB', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    }) : 'Unknown';
+    
+    statusEl.textContent = 'â Auto-scanning enabled';
+    
+    resultsEl.innerHTML = `
+        <div style="text-align: center; padding: 1rem;">
+            <p style="font-size: 1.1rem; margin-bottom: 1rem;">
+                <strong>ð¤ This site updates automatically!</strong>
+            </p>
+            <p style="margin-bottom: 1rem;">
+                Our AI scans UK news sources <strong>every day at 9am</strong> for new government U-turns.
+            </p>
+            <p style="margin-bottom: 1rem; padding: 0.75rem; background: var(--paper); border: 2px solid var(--ink);">
+                ð <strong>Last scan:</strong><br>
+                ${lastUpdateStr}
+            </p>
+            <p style="margin-bottom: 1rem;">
+                <strong>Current count: ${uturnsData ? uturnsData.meta.totalCount : '?'} U-turns</strong>
+            </p>
+            <hr style="margin: 1.5rem 0; border: none; border-top: 2px dashed var(--ink);">
+            <p style="font-size: 0.9rem; color: var(--ink-light);">
+                ð¢ Want to be notified of new U-turns?
+            </p>
+            <div style="margin-top: 1rem; display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
+                <a href="https://twitter.com/search?q=uk%20government%20u-turn" target="_blank" 
+                   style="padding: 0.5rem 1rem; background: var(--ink); color: white; text-decoration: none; font-family: var(--font-mono); font-size: 0.8rem;">
+                    Search on X
+                </a>
+                <a href="https://github.com/matthewdavidrussell/uk-uturn-tracker" target="_blank"
+                   style="padding: 0.5rem 1rem; background: var(--ink); color: white; text-decoration: none; font-family: var(--font-mono); font-size: 0.8rem;">
+                    Watch on GitHub
+                </a>
+            </div>
+        </div>
+    `;
 }
 
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+function closeScanModal() {
+    document.getElementById('scanModal').classList.remove('active');
 }
-
-// Refresh last checked every minute
-setInterval(updateLastChecked, 60000);
