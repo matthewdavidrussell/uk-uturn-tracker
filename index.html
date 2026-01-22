@@ -170,16 +170,22 @@
         <h2 class="section-title">🐦 Political Pulse</h2>
         <p class="section-subtitle">What journalists and commentators are saying</p>
         
-        <div class="social-grid">
-            <div class="twitter-embed">
-                <a class="twitter-timeline" 
-                   data-height="500" 
-                   data-theme="light"
-                   data-chrome="noheader nofooter noborders"
-                   href="https://twitter.com/search?q=%22government%20u-turn%22%20OR%20%22policy%20reversal%22%20lang%3Aen&f=live">
-                   Loading tweets about UK government U-turns...
-                </a>
-            </div>
+        <div class="live-feed-container">
+                            <div class="feed-header">
+                                                    <span class="feed-status"><span class="live-dot-small"></span>span> Live Feed</span>span>
+                                                    <button class="refresh-btn" id="refreshFeed" title="Refresh feed">🔄</button>button>
+                            </div>div>
+                            <div class="live-feed" id="liveFeed">
+                                                    <div class="feed-loading">
+                                                                                <div class="feed-spinner"></div>div>
+                                                                                <p>Loading live political commentary...</p>
+                                                    </div>div>
+                            </div>div>
+                        <div class="feed-footer">
+                                            <span>Last updated: <span id="feedLastUpdate">--:--</span></span>
+                                            <span class="feed-note">Auto-refreshes every 5 minutes</span>
+                        </div>div>
+        </div>div></span></p>
             <div class="journalist-feeds">
                 <h3>📌 Follow the Story</h3>
                 <div class="journalist-list">
