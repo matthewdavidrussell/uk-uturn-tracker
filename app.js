@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderMinisterLeaderboard();
         renderUturns();
         renderSpeedRuns();
+            initLiveSocialFeed();
         renderTimeline();
 });
 
@@ -315,5 +316,202 @@ function showScanInfo() {
 }
 
 function closeScanModal() {
+
+        // ==========================================================================
+        // LIVE SOCIAL FEED - Dynamic X/Twitter-style feed
+        // ==========================================================================
+
+        const SOCIAL_CONFIG = {
+                    accounts: [
+                            { handle: 'PippaCrerar', name: 'Pippa Crerar', outlet: 'The Guardian' },
+                            { handle: 'BethRigby', name: 'Beth Rigby', outlet: 'Sky News' },
+                            { handle: 'Peston', name: 'Robert Peston', outlet: 'ITV News' },
+                            { handle: 'Steven_Swinford', name: 'Steven Swinford', outlet: 'The Times' },
+                            { handle: 'SamCoatesSky', name: 'Sam Coates', outlet: 'Sky News' },
+                            { handle: 'tnewtondunn', name: 'Tom Newton Dunn', outlet: 'Times Radio' }
+                                ],
+                    keywords: ['u-turn', 'uturn', 'reversal', 'climbdown', 'backtrack', 'backs down', 'u turn', 'policy change'],
+                    rssProxies: ['https://api.rss2json.com/v1/api.json?rss_url='],
+                    nitterInstances: ['nitter.poast.org', 'nitter.privacydev.net'],
+                    refreshInterval: 300000,
+                    maxPosts: 20
+        };
+
+        let socialFeedData = [];
+        let currentNitterIndex = 0;
+
+        async function initLiveSocialFeed() {
+                    const container = document.getElementById('liveFeed');
+                    if (!container) return;
+
+                    container.innerHTML = '<div class="feed-loading"><div class="feed-spinner"></div><p>Loading live political commentary...</p></div>';
+
+                    await fetchSocialFeed();
+                    setInterval(fetchSocialFeed, SOCIAL_CONFIG.refreshInterval);
+
+                    const refreshBtn = document.getElementById('refreshFeed');
+                    if (refreshBtn) {
+                                    refreshBtn.addEventListener('click', async () => {
+                                                        refreshBtn.classList.add('spinning');
+                                                        await fetchSocialFeed();
+                                                        refreshBtn.classList.remove('spinning');
+                                    });
+                    }
+        }
+
+        async function fetchSocialFeed() {
+                    const container = document.getElementById('liveFeed');
+                    if (!container) return;
+
+                    socialFeedData = [];
+
+                    const fetchPromises = SOCIAL_CONFIG.accounts.slice(0, 6).map(account =>
+                                    fetchAccountFeed(account).catch(() => [])
+                                );
+
+                    const results = await Promise.allSettled(fetchPromises);
+
+                    results.forEach(result => {
+                                    if (result.status === 'fulfilled' && result.value) {
+                                                        socialFeedData = socialFeedData.concat(result.value);
+                                    }
+                    });
+
+                    socialFeedData.sort((a, b) => {
+                                    const aHasKeyword = hasUturnKeyword(a.content);
+                                    const bHasKeyword = hasUturnKeyword(b.content);
+                                    if (aHasKeyword && !bHasKeyword) return -1;
+                                    if (!aHasKeyword && bHasKeyword) return 1;
+                                    return new Date(b.date) - new Date(a.date);
+                    });
+
+                    socialFeedData = socialFeedData.slice(0, SOCIAL_CONFIG.maxPosts);
+                    renderSocialFeed();
+        }
+
+        async function fetchAccountFeed(account) {
+                    const posts = [];
+
+                    for (let i = 0; i < SOCIAL_CONFIG.nitterInstances.length; i++) {
+                                    const instanceIndex = (currentNitterIndex + i) % SOCIAL_CONFIG.nitterInstances.length;
+                                    const nitter = SOCIAL_CONFIG.nitterInstances[instanceIndex];
+                                    const rssUrl = `https://${nitter}/${account.handle}/rss`;
+
+                                    try {
+                                                        const proxyUrl = SOCIAL_CONFIG.rssProxies[0] + encodeURIComponent(rssUrl);
+                                                        const response = await fetch(proxyUrl, { signal: AbortSignal.timeout(5000) });
+
+                                                        if (!response.ok) continue;
+
+                                                        const data = await response.json();
+
+                                                        if (data.status === 'ok' && data.items) {
+                                                                                data.items.slice(0, 5).forEach(item => {
+                                                                                                            posts.push({
+                                                                                                                                            handle: account.handle,
+                                                                                                                                            name: account.name,
+                                                                                                                                            outlet: account.outlet,
+                                                                                                                                            content: cleanHtml(item.title || item.description || ''),
+                                                                                                                                            date: new Date(item.pubDate),
+                                                                                                                                            link: item.link || `https://x.com/${account.handle}`
+                                                                                                                    });
+                                                                                        });
+                                                                                currentNitterIndex = instanceIndex;
+                                                                                return posts;
+                                                        }
+                                    } catch (err) {
+                                                        continue;
+                                    }
+                    }
+                    return posts;
+        }
+
+        function hasUturnKeyword(text) {
+                    const lowerText = text.toLowerCase();
+                    return SOCIAL_CONFIG.keywords.some(keyword => lowerText.includes(keyword.toLowerCase()));
+        }
+
+        function cleanHtml(html) {
+                    const div = document.createElement('div');
+                    div.innerHTML = html;
+                    return div.textContent || div.innerText || '';
+        }
+
+        function highlightKeywords(text) {
+                    let highlighted = text;
+                    SOCIAL_CONFIG.keywords.forEach(keyword => {
+                                    const regex = new RegExp(`(${keyword})`, 'gi');
+                                    highlighted = highlighted.replace(regex, '<mark class="keyword-highlight">$1</mark>');
+                    });
+                    return highlighted;
+        }
+
+        function formatTimeAgo(date) {
+                    const now = new Date();
+                    const diff = now - date;
+                    const minutes = Math.floor(diff / 60000);
+                    const hours = Math.floor(diff / 3600000);
+                    const days = Math.floor(diff / 86400000);
+
+                    if (minutes < 1) return 'Just now';
+                    if (minutes < 60) return `${minutes}m ago`;
+                    if (hours < 24) return `${hours}h ago`;
+                    if (days < 7) return `${days}d ago`;
+                    return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+        }
+
+        function renderSocialFeed() {
+                    const container = document.getElementById('liveFeed');
+                    if (!container) return;
+
+                    if (socialFeedData.length === 0) {
+                                    container.innerHTML = '<div class="feed-empty"><p>📡 Unable to fetch live posts right now.</p><p class="feed-empty-sub">The journalists listed below are great follows for U-turn news!</p></div>';
+                                    return;
+                    }
+
+                    const uturnPosts = socialFeedData.filter(post => hasUturnKeyword(post.content));
+                    const otherPosts = socialFeedData.filter(post => !hasUturnKeyword(post.content));
+
+                    let html = '';
+
+                    if (uturnPosts.length > 0) {
+                                    html += '<div class="feed-section-label">🔥 U-Turn Related</div>';
+                                    html += uturnPosts.map(post => renderPost(post, true)).join('');
+                    }
+
+                    if (otherPosts.length > 0) {
+                                    html += '<div class="feed-section-label">📰 Latest Political Commentary</div>';
+                                    html += otherPosts.slice(0, 10).map(post => renderPost(post, false)).join('');
+                    }
+
+                    container.innerHTML = html;
+
+                    const timestampEl = document.getElementById('feedLastUpdate');
+                    if (timestampEl) {
+                                    timestampEl.textContent = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+                    }
+        }
+
+        function renderPost(post, isUturn) {
+                    const content = isUturn ? highlightKeywords(post.content) : post.content;
+                    const truncated = content.length > 280 ? content.substring(0, 277) + '...' : content;
+
+                    return `
+                            <a href="${post.link}" target="_blank" rel="noopener" class="feed-post ${isUturn ? 'uturn-mention' : ''}">
+                                        <div class="post-header">
+                                                        <div class="post-author">
+                                                                            <span class="author-name">${post.name}</span>
+                                                                                                <span class="author-handle">@${post.handle}</span>
+                                                                                                                </div>
+                                                                                                                                <span class="post-outlet">${post.outlet}</span>
+                                                                                                                                            </div>
+                                                                                                                                                        <div class="post-content">${truncated}</div>
+                                                                                                                                                                    <div class="post-footer">
+                                                                                                                                                                                    <span class="post-time">${formatTimeAgo(post.date)}</span>
+                                                                                                                                                                                                    <span class="post-platform">via X</span>
+                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                        </a>
+                                                                                                                                                                                                                            `;
+        }
         document.getElementById('scanModal').classList.remove('active');
 }
